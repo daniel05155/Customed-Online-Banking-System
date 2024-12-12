@@ -1,0 +1,30 @@
+{% extends 'common/base.html' %}
+
+{% block content %}
+<h1 class="font-mono font-bold text-3xl text-center pb-5 pt-10">{{ title }}</h1> <!-- 加入標題 -->
+<hr />
+<div class="w-full mt-5">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Account</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.transaction_id }}</td>
+                    <td>{{ transaction.account }}</td>
+                    <td>{{ transaction.transaction_type }}</td>
+                    <td>{{ transaction.transaction_amount }}</td>
+                    <td>{{ transaction.transaction_time }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
