@@ -4,7 +4,7 @@
 
 <!-- container主要是限制你的內容總寬度 https://bootstrap5.hexschool.com/docs/5.0/layout/grid/ -->
 <div class="container text-center mt-5">
-    <h1 class="font-weight-bold">Welcome to Your Online Banking</h1>
+    <h1 class="font-weight-bold">Welcome to Our Online Banking</h1>
     <p class="lead">Easily manage your transactions with our secure online banking services.</p>
     <hr class="my-4">
 
@@ -26,6 +26,16 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Transfer</h5>
+                    <a href="{% url 'transfer' %}" class="btn btn-primary btn-block">Go to Transfer</a>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}
