@@ -3,10 +3,22 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages 
 
+from .models import AccountInfo
 from .forms import RegistrationForm, EditProfileForm
 
 def home(request): 
-	return render(request, 'accounts/home.html', {})
+	try:
+		account_info = AccountInfo.objects.get(account_user=request.user)
+		context = {
+			'username': request.user.username,
+			'account_no': account_info.account_No
+		}
+	except AccountInfo.DoesNotExist:
+		context = {
+			'username': request.user.username,
+			'account_no': 'N/A'
+		}
+	return render(request, 'common/home.html', context)
 
 def login_user (request):
 	if request.method == 'POST': 			# if someone fills out form , Post it 
