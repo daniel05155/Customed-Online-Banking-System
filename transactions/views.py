@@ -8,12 +8,16 @@ from .forms import TransactionForm, TransferForm
 from .models import AccountInfo, Transaction, Transfer
 
 from decimal import Decimal 
+from .models import AccountInfo, Transaction, Transfer
+
+from decimal import Decimal 
 
 def deposit(request):
     deposit_title = "Deposit Money to Account."
     if request.method == 'POST':
         transaction_form = TransactionForm(request.POST)
         if transaction_form.is_valid():
+            account = AccountInfo.objects.get(account_user=request.user)
             account = AccountInfo.objects.get(account_user=request.user)
             deposit_amount = transaction_form.cleaned_data['transaction_amount']
 
@@ -27,11 +31,17 @@ def deposit(request):
                     transaction_account_info = account,
                     transaction_type = 'Deposit',
                     transaction_amount = deposit_amount
+                    transaction_account_info = account,
+                    transaction_type = 'Deposit',
+                    transaction_amount = deposit_amount
                 )
             messages.success(request, 'Deposit successfully!')
             return redirect('home')
         else:
             messages.error(request, 'Errors! Please correct the errors below.')
+
+    transaction_form = TransactionForm()
+    context = {'title': deposit_title, 'transaction_form': transaction_form}
 
     transaction_form = TransactionForm()
     context = {'title': deposit_title, 'transaction_form': transaction_form}
@@ -43,10 +53,12 @@ def withdrawal(request):
         transaction_form = TransactionForm(request.POST)
         if transaction_form.is_valid():
             account_info = AccountInfo.objects.get(account_user=request.user)
+            account_info = AccountInfo.objects.get(account_user=request.user)
             withdrawal_amount = transaction_form.cleaned_data['transaction_amount']
 
             # Check if the account has enough balance
             if account_info.account_balance >= withdrawal_amount:
+                
                 
                 # Update account balance
                 with transaction.atomic():
@@ -55,6 +67,9 @@ def withdrawal(request):
 
                     # Create a transaction record
                     Transaction.objects.create(
+                        transaction_account_info = account_info,
+                        transaction_type   = 'Withdrawal',
+                        transaction_amount = withdrawal_amount
                         transaction_account_info = account_info,
                         transaction_type   = 'Withdrawal',
                         transaction_amount = withdrawal_amount
@@ -68,9 +83,12 @@ def withdrawal(request):
             messages.error(request, 'Please correct the errors below.')
         
     transaction_form = TransactionForm()
+        
+    transaction_form = TransactionForm()
     context = {'title': withdraw_title, 'transaction_form': transaction_form}
     return render(request, 'transactions/transactions_action.html', context)
 
+@login_required
 @login_required
 def transaction_report(request):
     try:
@@ -90,6 +108,7 @@ def transaction_report(request):
         }
     return render(request, 'transactions/transactions_report.html', context)
 
+@login_required
 @login_required
 def transfer(request):
     """

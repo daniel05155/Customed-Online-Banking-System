@@ -2,8 +2,12 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 
+from django.core.exceptions import ValidationError
+from django.utils.timezone import now
+
 from accounts.models import AccountInfo
 class Transaction(models.Model):
+    
     
     TRANSACTION_TYPE_CHOICES = [
         ('Deposit', 'Deposit'),
