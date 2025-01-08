@@ -12,6 +12,7 @@ from .models import AccountInfo, Transaction, Transfer
 
 from decimal import Decimal 
 
+@login_required
 def deposit(request):
     deposit_title = "Deposit Money to Account."
     if request.method == 'POST':
@@ -47,6 +48,7 @@ def deposit(request):
     context = {'title': deposit_title, 'transaction_form': transaction_form}
     return render(request, 'transactions/transactions_action.html', context)
 
+@login_required
 def withdrawal(request):
     withdraw_title = "Withdrawal Money from Account."
     if request.method == 'POST':
@@ -89,10 +91,8 @@ def withdrawal(request):
     return render(request, 'transactions/transactions_action.html', context)
 
 @login_required
-@login_required
 def transaction_report(request):
     try:
-       
         account_info = AccountInfo.objects.get(account_user=request.user)
         transactions = Transaction.objects.filter(transaction_account_info=account_info)
         context = {
@@ -108,7 +108,6 @@ def transaction_report(request):
         }
     return render(request, 'transactions/transactions_report.html', context)
 
-@login_required
 @login_required
 def transfer(request):
     """
