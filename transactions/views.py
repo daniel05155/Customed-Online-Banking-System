@@ -4,10 +4,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from .forms import TransactionForm, TransferForm
-from .models import AccountInfo, Transaction, Transfer
-
-from decimal import Decimal 
+from .forms import TransactionForm, TransferForm, TransactionDateRangeForm
 from .models import AccountInfo, Transaction, Transfer
 
 from decimal import Decimal 
@@ -18,31 +15,28 @@ def deposit(request):
     if request.method == 'POST':
         transaction_form = TransactionForm(request.POST)
         if transaction_form.is_valid():
-            account = AccountInfo.objects.get(account_user=request.user)
-            account = AccountInfo.objects.get(account_user=request.user)
+            print(f'User: {request.user}')
+            account_info = AccountInfo.objects.get(account_user=request.user)
             deposit_amount = transaction_form.cleaned_data['transaction_amount']
+            transaction_note = transaction_form.cleaned_data['transaction_note']
 
             # Update account balance
             with transaction.atomic():
-                account.account_balance += deposit_amount
-                account.save()
+                account_info.account_balance += deposit_amount
+                account_info.save()
 
-                # Create a transaction record
+                # Create a transaction record and Write to the database
                 Transaction.objects.create(
-                    transaction_account_info = account,
-                    transaction_type = 'Deposit',
-                    transaction_amount = deposit_amount
-                    transaction_account_info = account,
-                    transaction_type = 'Deposit',
-                    transaction_amount = deposit_amount
+                    transaction_account_info = account_info,
+                    transaction_type   = 'Deposit',
+                    transaction_amount = deposit_amount,
+                    transaction_balance_after = account_info.account_balance,  
+                    transaction_note = transaction_note
                 )
             messages.success(request, 'Deposit successfully!')
             return redirect('home')
         else:
             messages.error(request, 'Errors! Please correct the errors below.')
-
-    transaction_form = TransactionForm()
-    context = {'title': deposit_title, 'transaction_form': transaction_form}
 
     transaction_form = TransactionForm()
     context = {'title': deposit_title, 'transaction_form': transaction_form}
@@ -55,28 +49,24 @@ def withdrawal(request):
         transaction_form = TransactionForm(request.POST)
         if transaction_form.is_valid():
             account_info = AccountInfo.objects.get(account_user=request.user)
-            account_info = AccountInfo.objects.get(account_user=request.user)
             withdrawal_amount = transaction_form.cleaned_data['transaction_amount']
+            transaction_note  = transaction_form.cleaned_data['transaction_note']
 
             # Check if the account has enough balance
             if account_info.account_balance >= withdrawal_amount:
-                
-                
                 # Update account balance
                 with transaction.atomic():
                     account_info.account_balance -= withdrawal_amount
                     account_info.save()
 
-                    # Create a transaction record
+                    # Create a transaction record and Write to the database
                     Transaction.objects.create(
                         transaction_account_info = account_info,
                         transaction_type   = 'Withdrawal',
-                        transaction_amount = withdrawal_amount
-                        transaction_account_info = account_info,
-                        transaction_type   = 'Withdrawal',
-                        transaction_amount = withdrawal_amount
+                        transaction_amount = withdrawal_amount,
+                        transaction_balance_after = account_info.account_balance,
+                        transaction_note   = transaction_note
                     )
-
                 messages.success(request, 'Withdrawal successfully!')
                 return redirect('home')
             else:
@@ -85,27 +75,34 @@ def withdrawal(request):
             messages.error(request, 'Please correct the errors below.')
         
     transaction_form = TransactionForm()
-        
-    transaction_form = TransactionForm()
     context = {'title': withdraw_title, 'transaction_form': transaction_form}
     return render(request, 'transactions/transactions_action.html', context)
 
 @login_required
 def transaction_report(request):
+    account_info = None
+    transactions = []
+    form = None
     try:
         account_info = AccountInfo.objects.get(account_user=request.user)
         transactions = Transaction.objects.filter(transaction_account_info=account_info)
-        context = {
-            'username': request.user.username,
-            'account_no': account_info.account_No,
-            'transactions': transactions
-        }
+        # Handle date range form
+        form = TransactionDateRangeForm(request.GET or None)
+        if form.is_valid():
+            daterange = form.cleaned_data['daterange']
+            if daterange:
+                start_date, end_date = daterange
+                transactions = transactions.filter(transaction_time__date__range=(start_date, end_date))
+
     except AccountInfo.DoesNotExist:
-        context = {
-            'username': request.user.username,
-            'account_no': 'N/A',
-            'transactions': [],
-        }
+        messages.error(request, "No account information found for the current user.")
+    
+    context = {
+        'username': request.user.username,
+        'account_no': account_info.account_No,
+        'transactions': transactions,
+         'form': form if form else TransactionDateRangeForm(),
+    }
     return render(request, 'transactions/transactions_report.html', context)
 
 @login_required
@@ -121,7 +118,6 @@ def transfer(request):
         from_account_no = request.POST.get('from_account', '').strip()
         to_account_no   = request.POST.get('to_account', '').strip()
         amount_str      = request.POST.get('amount', '').strip()
-
         # Validate input fields
         if not from_account_no or not to_account_no or not amount_str:
             messages.error(request, 'All fields are required.')
@@ -154,8 +150,7 @@ def transfer(request):
         if from_account.account_balance < amount:
             messages.error(request, 'Insufficient balance in the sender account.')
             return redirect('transfer')
-
-        # 使用 transaction.atomic()
+        
         try:
             with transaction.atomic():
                 # 1) 先扣款 (from_account)
@@ -186,14 +181,13 @@ def transfer(request):
                 to_account.account_balance += amount
                 to_account.save()
 
-                # 6) 建立to_account的Transaction (ype=Transfer)，並紀錄交易後餘額
+                # 6) 建立to_account的Transaction，並紀錄交易後餘額
                 transfer_transaction = Transaction.objects.create(
                     transaction_account_info   = to_account,
                     transaction_type           = 'Transfer',
                     transaction_amount         = amount,
                     transaction_balance_after  = to_account.account_balance
                 )
-
                 transfer_obj.transfer_status = 'Completed'
                 transfer_obj.save()
 
@@ -202,10 +196,9 @@ def transfer(request):
                 f'Successfully transferred {amount} from account {from_account_no} to account {to_account_no}.'
             )
         except ValidationError as e:
-            # 若發生 ValidationError（例如超過每日限額），atomic 會回滾
+            # 若發生 ValidationError（例如: 超過每日限額)
             messages.error(request, str(e))
-
         return redirect('transfer')
 
-    # Render the transfer form for GET request
+    # GET request
     return render(request, 'transactions/transfer.html')
