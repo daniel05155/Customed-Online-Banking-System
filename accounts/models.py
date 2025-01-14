@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from .managers import AccountManager
 
 # https://docs.djangoproject.com/en/5.1/ref/contrib/auth/
-class User(AbstractUser):
+class UserInfo(AbstractUser):
 
     GENDER_CHOICES = [
         ('Male', 'Male'),
@@ -21,7 +21,7 @@ class User(AbstractUser):
 class UserAddress(models.Model):
     
     user_address_id = models.AutoField(primary_key=True)
-    user    = models.OneToOneField(User, on_delete=models.CASCADE)   ##  == models.ForeignKey(unique=True)
+    user    = models.OneToOneField(UserInfo, on_delete=models.CASCADE)   ##  == models.ForeignKey(unique=True)
     country = models.CharField(max_length=255)
     city    = models.CharField(max_length=255)
     street_address = models.CharField(max_length=255)
@@ -34,9 +34,9 @@ class AccountInfo(models.Model):
         ('Business', 'Business'),
     ]
     account_id   = models.AutoField(primary_key=True)
-    account_user = models.OneToOneField(User, on_delete=models.CASCADE)             # User Can have only one accounts
+    account_user = models.OneToOneField(UserInfo, on_delete=models.CASCADE)             # User Can have only one accounts
     account_type = models.CharField(max_length=8, choices=ACCOUNT_TYPE_CHOICES)
-    account_No   = models.CharField(max_length=11, unique=True)                     # Must be 11 digits (10000000001-99999999999)
+    account_No   = models.CharField(max_length=11, unique=True)                         # Must be 11 digits (10000000001-99999999999)
     account_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)  # Decimal field
     
     # Bind the custom manager

@@ -7,17 +7,18 @@ from .models import AccountInfo
 from .forms import RegistrationForm, EditProfileForm
 
 def home(request): 
+	if not request.user.is_authenticated:
+		return redirect('login')
 	try:
 		account_info = AccountInfo.objects.get(account_user=request.user)
-		context = {
-			'username': request.user.username,
-			'account_no': account_info.account_No
-		}
+		account_no = account_info.account_No
 	except AccountInfo.DoesNotExist:
-		context = {
-			'username': request.user.username,
-			'account_no': 'N/A'
-		}
+		account_no='N/A'
+	
+	context = {
+		'username': request.user.username,
+		'account_no': account_no
+	}
 	return render(request, 'common/home.html', context)
 
 def login_user (request):
@@ -50,13 +51,12 @@ def register_user(request):
 			user = authenticate(username=username, password=password)
 			if user is not None:
 				messages.success(request,('You are registered successfully!'))	
-				login(request,user)
+				login(request, user)
 				return redirect('home')
 			else:
 				messages.error(request, 'Please correct the errors below.')
 		else:
 			messages.error(request, 'Registration form is not valid.')
-	# GET 
 	return render(request, 'accounts/register.html', context)
 
 # Error
