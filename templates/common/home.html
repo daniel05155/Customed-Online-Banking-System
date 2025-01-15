@@ -2,40 +2,58 @@
 
 {% block content %}
 
-<!-- container: https://bootstrap5.hexschool.com/docs/5.0/layout/grid/ -->
 <div class="container text-center mt-5">
     <h1 class="font-weight-bold">Welcome, {{ username }}!</h1>
     <p class="lead">Account Number: <strong>{{ account_no }}</strong></p>
     <hr class="my-4">
 
+    <!-- Overview Section -->
     <div class="row mt-5">
-        <div class="col-md-4">
+        <!-- Account Balance -->
+        <div class="col-md-6 mb-4">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Deposit Money</h5>
-                    <a href="{% url 'deposit' %}" class="btn btn-primary btn-block">Go to Deposit</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Withdraw Money</h5>
-                    <!-- <p class="card-text">Withdraw funds from your account securely and efficiently.</p> -->
-                    <a href="{% url 'withdrawal' %}" class="btn btn-primary btn-block">Go to Withdrawal</a>
+                    <h5 class="card-title">Account Balance</h5>
+                    <p class="card-text display-4 text-success">${{ account_balance }}</p>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <!-- Recent Transactions -->
+        <div class="col-md-6 mb-4">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Transfer</h5>
-                    <a href="{% url 'transfer' %}" class="btn btn-primary btn-block">Go to Transfer</a>
+                    <h5 class="card-title">Recent Transactions</h5>
+                    {% if recent_transactions %}
+                        <ul class="list-group">
+                            {% for transaction in recent_transactions %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ transaction.date }} - {{ transaction.type }}
+                                    <span class="badge {{ transaction.amount_class }}">${{ transaction.amount }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">No recent transactions available.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- Support Section -->
+    <div class="row mt-4">
+        <!-- Quick Contact -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Contact Support</h5>
+                    <p class="card-text">Need help? Reach out to our support team for assistance.</p>
+                    <a href="mailto:support@onlinebank.com" class="btn btn-primary btn-block">Email Support</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 {% endblock %}

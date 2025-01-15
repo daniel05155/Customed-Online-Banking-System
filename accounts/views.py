@@ -12,12 +12,14 @@ def home(request):
 	try:
 		account_info = AccountInfo.objects.get(account_user=request.user)
 		account_no = account_info.account_No
+		account_balance = account_info.account_balance
 	except AccountInfo.DoesNotExist:
 		account_no='N/A'
-	
+		account_balance='N/A'
 	context = {
 		'username': request.user.username,
-		'account_no': account_no
+		'account_no': account_no,
+		'account_balance': account_balance
 	}
 	return render(request, 'common/home.html', context)
 
@@ -32,8 +34,7 @@ def login_user (request):
 		else:
 			messages.success(request,('Error logging in'))
 			return redirect('login')  	    # == return render(request, 'accounts/login.html', {})	
-	else:
-		return render(request, 'accounts/login.html', {})
+	return render(request, 'accounts/login.html', {})
 
 def logout_user(request):
 	logout(request)
