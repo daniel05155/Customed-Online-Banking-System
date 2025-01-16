@@ -2,27 +2,22 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 
-from django.core.exceptions import ValidationError
-from django.utils.timezone import now
-
 from accounts.models import AccountInfo
+
 class Transaction(models.Model):
-    
     
     TRANSACTION_TYPE_CHOICES = [
         ('Deposit', 'Deposit'),
         ('Withdrawal', 'Withdrawal'),
         ('Transfer', 'Transfer'),
     ]
-    
     transaction_id      = models.AutoField(primary_key=True)
     transaction_account_info = models.ForeignKey(AccountInfo, on_delete=models.CASCADE, related_name='transactions')  # One-to-Many
     transaction_type    = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES)
     transaction_time    = models.DateTimeField(auto_now_add=True)
     transaction_amount  = models.DecimalField(max_digits=15, decimal_places=2)
-    transaction_note    = models.TextField(null=True, blank=True)                       # New field for transaction remarks
-    transaction_balance_after = models.DecimalField(max_digits=15, decimal_places=2, default=0)   # Balance after each transaction
-
+    transaction_note    = models.TextField(null=True, blank=True, default="")                    # transaction remarks
+    transaction_balance_after = models.DecimalField(max_digits=15, decimal_places=2, default=0)  # Balance after each transaction
 class Transfer(models.Model):
     
     # 每筆轉帳的處理狀態
@@ -30,14 +25,14 @@ class Transfer(models.Model):
         ('Completed', 'Completed'),
         ('Failed', 'Failed'),
     ]
-    
+
     transfer_id               = models.AutoField(primary_key=True)
     transfer_from_account     = models.ForeignKey(AccountInfo, on_delete=models.CASCADE, related_name='transfers_from')
     transfer_to_account       = models.ForeignKey(AccountInfo, on_delete=models.CASCADE, related_name='transfers_to')
     transfer_info             = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='transfers',null=True, blank=True)  # Link to Transaction
     transfer_status           = models.CharField(max_length=10, choices=TRANSFER_STATUS_CHOICES, default='Failed')
     # transfer_amount   = models.DecimalField(max_digits=15, decimal_places=2)      # FK: Daily limit of 100,000
-    # transfer_time     = models.DateTimeField(auto_now_add=True)                       # FK: Transaction.transaction_time
+    # transfer_time     = models.DateTimeField(auto_now_add=True)                   # FK: Transaction.transaction_time
     
     def clean(self):
         # 確保來源和目標帳戶不能相同

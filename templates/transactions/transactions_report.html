@@ -1,8 +1,25 @@
 {% extends 'common/base.html' %}
 
 {% block content %}
-<h1 class="font-mono font-bold text-3xl text-center pb-5 pt-10">Transaction Report</h1> <!-- 加入標題 -->
+<h1 class="font-mono font-bold text-3xl text-center pb-5 pt-10">Transaction Report</h1>
 <hr />
+<!-- Data Range Picker -->
+<form method="get">
+    <div class="mt-10 h-10 pl-3 pr-2 bg-white border rounded-md border-gray-500 flex justify-between items-center relative">
+        <input type="search" name="daterange" id="search" placeholder="Filter using date range" value="{{ request.GET.daterange }}" class="appearance-none w-full outline-none focus:outline-none active:outline-none" />
+        <button type="submit" class="ml-1 outline-none focus:outline-none active:outline-none">
+            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-6 h-6">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </button>
+    </div>
+    {% if form.daterange.errors %}
+        {% for error in form.daterange.errors %}
+            <p class="text-red-600 text-sm italic">{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+</form>
+
 <div class="w-full mt-5">
     <table class="table table-bordered">
         <thead>
@@ -37,4 +54,53 @@
         </tbody>
     </table>
 </div>
+{% endblock %}
+
+{% block footer_extra %}
+<!-- Include the required JS and CSS for Date Range Picker -->
+<script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<script type="text/javascript">
+    $(function () {
+        // Initialize Date Range Picker
+        $('input[name="daterange"]').daterangepicker({
+            autoUpdateInput: true,
+            locale: {
+                format: "YYYY-MM-DD",
+                separator: " - ",
+                applyLabel: "Apply",
+                cancelLabel: "Clear",
+                daysOfWeek: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+                monthNames: [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ],
+                firstDay: 1,
+            },
+        });
+
+        // Event listener for apply button
+        $('input[name="daterange"]').on("apply.daterangepicker", function (ev, picker) {
+            $(this).val(picker.startDate.format("YYYY-MM-DD") + " - " + picker.endDate.format("YYYY-MM-DD"));
+        });
+
+        // Event listener for clear button
+        $('input[name="daterange"]').on("cancel.daterangepicker", function (ev, picker) {
+            $(this).val("");
+        });
+    });
+</script>
 {% endblock %}

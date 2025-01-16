@@ -15,7 +15,7 @@ def deposit(request):
     if request.method == 'POST':
         transaction_form = TransactionForm(request.POST)
         if transaction_form.is_valid():
-            print(f'User: {request.user}')
+            
             account_info = AccountInfo.objects.get(account_user=request.user)
             deposit_amount = transaction_form.cleaned_data['transaction_amount']
             transaction_note = transaction_form.cleaned_data['transaction_note']
@@ -86,6 +86,7 @@ def transaction_report(request):
     try:
         account_info = AccountInfo.objects.get(account_user=request.user)
         transactions = Transaction.objects.filter(transaction_account_info=account_info)
+
         # Handle date range form
         form = TransactionDateRangeForm(request.GET or None)
         if form.is_valid():
@@ -101,7 +102,7 @@ def transaction_report(request):
         'username': request.user.username,
         'account_no': account_info.account_No,
         'transactions': transactions,
-         'form': form if form else TransactionDateRangeForm(),
+        'form': form,
     }
     return render(request, 'transactions/transactions_report.html', context)
 
@@ -199,6 +200,5 @@ def transfer(request):
             # 若發生 ValidationError（例如: 超過每日限額)
             messages.error(request, str(e))
         return redirect('transfer')
-
     # GET request
     return render(request, 'transactions/transfer.html')
