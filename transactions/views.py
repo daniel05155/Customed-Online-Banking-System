@@ -108,7 +108,7 @@ def transaction_report(request):
 def transfer(request):
     """
     1. 使用 transaction.atomic()。
-    2. 為 from_account和to_account建立Transaction 記錄 (transaction_type='Transfer')。
+    2. 為 from_account和to_account建立Transaction 記錄。
     3. 連結該 Transaction 和 Transfer 。
     4. 檢查每日限額。
     5. 若成功則將 transfer_status 設為 'Completed'，並儲存 to_account 的餘額變動。
@@ -123,20 +123,20 @@ def transfer(request):
             return redirect('transfer')
 
         try:
-            # Retrieve sender's account
+            # Retrieve "Sender's" account
             from_account = AccountInfo.objects.get(account_No=from_account_no)
         except AccountInfo.DoesNotExist:
             messages.error(request, f'Sender account {from_account_no} does not exist.')
             return redirect('transfer')
 
         try:
-            # Retrieve receiver's account
+            # Retrieve "Receiver's" account
             to_account = AccountInfo.objects.get(account_No=to_account_no)
         except AccountInfo.DoesNotExist:
             messages.error(request, f'Recipient account {to_account_no} does not exist.')
             return redirect('transfer')
 
-        # 驗證金額
+        # Validate Amount 
         try:
             amount = Decimal(amount_str)
             if amount <= 0:
@@ -145,7 +145,7 @@ def transfer(request):
             messages.error(request, 'Enter a valid amount greater than 0.')
             return redirect('transfer')
         
-        # Ensure sufficient balance
+        # Ensure Sufficient Balance
         if from_account.account_balance < amount:
             messages.error(request, 'Insufficient balance in the sender account.')
             return redirect('transfer')
@@ -156,10 +156,10 @@ def transfer(request):
                 from_account.account_balance -= amount
                 from_account.save()
 
-                # 2) 建立 Transaction (type=Transfer)，並紀錄交易後餘額
-                transfer_transaction = Transaction.objects.create(
+                # 2) 建立 Sender Transaction，紀錄交易後餘額
+                transfer_sender = Transaction.objects.create(
                     transaction_account_info   = from_account,
-                    transaction_type           = 'Transfer',
+                    transaction_type           = 'Transfer_Sender',
                     transaction_amount         = amount,
                     transaction_balance_after  = from_account.account_balance
                 )
@@ -168,25 +168,26 @@ def transfer(request):
                 transfer_obj = Transfer.objects.create(
                     transfer_from_account  = from_account,
                     transfer_to_account    = to_account,
-                    transfer_info          = transfer_transaction,
-                    transfer_status        = 'Failed'  # 預設 Failed，檢查通過再改為 Completed
+                    transfer_info          = transfer_sender,
+                    transfer_status        = 'Failed'   # 預設 Failed，檢查通過再改為 Completed
                 )
 
                 # 4) 檢查每日限額
                 if transfer_obj.is_daily_limit_exceeded():
                     raise ValidationError("Daily limit exceeded.")
 
-                # 5) 如果沒超過限額，才進行加款(to_account)，並將 status 改為 Completed
+                # 5) 如果沒超過限額，才進行Receiver的加款(to_account)，並將 status 改為 Completed
                 to_account.account_balance += amount
                 to_account.save()
 
-                # 6) 建立to_account的Transaction，並紀錄交易後餘額
+                # 6) 建立Receiver的Transaction欄位，紀錄交易後餘額
                 transfer_transaction = Transaction.objects.create(
                     transaction_account_info   = to_account,
-                    transaction_type           = 'Transfer',
+                    transaction_type           = 'Transfer_Receiver',
                     transaction_amount         = amount,
                     transaction_balance_after  = to_account.account_balance
                 )
+
                 transfer_obj.transfer_status = 'Completed'
                 transfer_obj.save()
 

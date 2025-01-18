@@ -46,12 +46,12 @@
                     <td>{{ transaction.transaction_time|date:"Y-m-d" }}</td>
                     <td>{{ transaction.transaction_time|date:"H:i:s" }}</td>
                     <td>
-                        {% if transaction.transaction_type == 'Withdrawal' %}
+                        {% if transaction.transaction_type == 'Withdrawal' or transaction.transaction_type == 'Transfer_Sender' %}
                             {{ transaction.transaction_amount }}
                         {% endif %}
                     </td>
                     <td>
-                        {% if transaction.transaction_type == 'Deposit' %}
+                        {% if transaction.transaction_type == 'Deposit' or transaction.transaction_type == 'Transfer_Receiver' %}
                             {{ transaction.transaction_amount }}
                         {% endif %}
                     </td>
