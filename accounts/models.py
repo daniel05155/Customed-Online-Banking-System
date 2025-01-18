@@ -34,11 +34,16 @@ class AccountInfo(models.Model):
         ('Business', 'Business'),
     ]
     account_id   = models.AutoField(primary_key=True)
-    account_user = models.OneToOneField(UserInfo, on_delete=models.CASCADE)             # User Can have only one accounts
+    account_user = models.OneToOneField(UserInfo, on_delete=models.CASCADE)                 # User Can have only one accounts
     account_type = models.CharField(max_length=8, choices=ACCOUNT_TYPE_CHOICES)
-    account_No   = models.CharField(max_length=11, unique=True)                         # Must be 11 digits (10000000001-99999999999)
-    account_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)  # Decimal field
+    account_No   = models.CharField(max_length=11, unique=True)                             # Must be 11 digits (10000000001-99999999999)
+    account_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)    # Decimal field
     
     # Bind the custom manager
     objects = AccountManager()
+
+# Session Timer
+class SessionSettings(models.Model):
+    timeout_minutes = models.PositiveIntegerField(default=6, help_text="自動登出時間（分鐘）")
+    updated_at = models.DateTimeField(auto_now=True)
 

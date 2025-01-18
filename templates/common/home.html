@@ -1,7 +1,7 @@
 {% extends 'common/base.html' %}
+{% load static %}
 
 {% block content %}
-
 <div class="container text-center mt-5">
     <h1 class="font-weight-bold">Welcome, {{ username }}!</h1>
     <p class="lead">Account Number: <strong>{{ account_no }}</strong></p>
@@ -9,6 +9,7 @@
 
     <!-- Overview Section -->
     <div class="row mt-5">
+
         <!-- Account Balance -->
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm">
@@ -20,7 +21,7 @@
         </div>
 
         <!-- Recent Transactions -->
-        <div class="col-md-6 mb-4">
+        <!-- <div class="col-md-6 mb-4">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Recent Transactions</h5>
@@ -38,22 +39,18 @@
                     {% endif %}
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 
-    <!-- Support Section -->
-    <div class="row mt-4">
-        <!-- Quick Contact -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Contact Support</h5>
-                    <p class="card-text">Need help? Reach out to our support team for assistance.</p>
-                    <a href="mailto:support@onlinebank.com" class="btn btn-primary btn-block">Email Support</a>
-                </div>
-            </div>
-        </div>
+    <!-- Session Timeout Section -->
+    <div class="mt-5">
+        <h5>將在 <span id="timer-display">00:00</span> 後自動登出。</h5>
+        <button id="reset-timer-btn" class="btn btn-warning mt-3">重新計時</button>
     </div>
 </div>
+
+<!-- Import Js File -->
+<script type="module" src="{% static 'js/session_timer.js' %}" data-timeout-minutes="{{ timeout_minutes|default:5 }}"></script>
+
 
 {% endblock %}

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserInfo, UserAddress, AccountInfo
+from .models import UserInfo, UserAddress, AccountInfo, SessionSettings
 
 # Register your models here.
 class UserAdmin(admin.ModelAdmin):
@@ -18,3 +18,7 @@ class AccountInfoAdmin(admin.ModelAdmin):
 
 admin.site.register(AccountInfo, AccountInfoAdmin)
 
+class SessionSettingsAdmin(admin.ModelAdmin):
+    list_display = ['timeout_minutes', 'updated_at']
+
+admin.site.register(SessionSettings, SessionSettingsAdmin)
