@@ -1,26 +1,23 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
           crossorigin="anonymous">
+    <!-- Date Range Picker CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
     <title>Online Bank System</title>
   </head>
   
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <!-- 原始首頁連結 (保留) -->
-      <a class="navbar-brand" href="{% url 'home'  %}">Online Bank</a>
-      
-      <!-- 移除 Deposit、Withdrawal，保留 Transaction Report -->
+      <a class="navbar-brand" href="{% url 'home'  %}">Testing</a>
       <a class="navbar-brand" href="{% url 'transaction_report'  %}">Transaction Report</a>
 
-      <!-- [新增] Finance 下拉選單，將 Deposit / Withdrawal 放進來 -->
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle navbar-brand" href="#" id="financeDropdown" 
@@ -34,27 +31,26 @@
           </div>
         </li>
         
-        <!-- [新增] About 下拉選單 -->
+        <!-- DropDown list of about -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle navbar-brand" href="#" id="aboutDropdown" 
              role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             About
           </a>
           <div class="dropdown-menu" aria-labelledby="aboutDropdown">
-            <!-- 這裡可以放置關於網站／公司等超連結 -->
             <!-- <a class="dropdown-item" href="#">Team</a> -->
           </div>
         </li>
       </ul>
 
-      <!-- 原始的 Toggler (保留) -->
+      <!-- Initial Toggler  -->
       <button class="navbar-toggler" type="button" data-toggle="collapse" 
               data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
               aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- 原始的右側導覽列 (保留) -->
+      <!-- 右側導覽列 -->
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto">
           {# Will know if user is logged in or not #}
@@ -91,13 +87,16 @@
               {{ message }}
           </div>
         {% endfor %}
+        
       {% endif %}
 
       {% block content %}
       {% endblock %}
+
+      {% block footer_extra %}
+      {% endblock %}
     </div>
 
-    <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
             integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" 
@@ -108,5 +107,10 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" 
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" 
             crossorigin="anonymous"></script>
+    
+    <!-- Date Range Picker JS -->
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
   </body>
 </html>

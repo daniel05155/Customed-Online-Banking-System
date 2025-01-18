@@ -17,8 +17,7 @@ class TransferForm(TransactionForm):
 
 class TransactionDateRangeForm(forms.Form):
     daterange = forms.CharField(required=False)
-    # print(daterange)
-
+    
     def clean_daterange(self):
         daterange = self.cleaned_data.get("daterange")
         if not daterange:
@@ -30,3 +29,4 @@ class TransactionDateRangeForm(forms.Form):
             return [start_date, end_date]
         except (ValueError, AttributeError):
             raise forms.ValidationError("Invalid date range format. Expected 'YYYY-MM-DD - YYYY-MM-DD'.")
+

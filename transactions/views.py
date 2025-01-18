@@ -86,7 +86,6 @@ def transaction_report(request):
     try:
         account_info = AccountInfo.objects.get(account_user=request.user)
         transactions = Transaction.objects.filter(transaction_account_info=account_info)
-
         # Handle date range form
         form = TransactionDateRangeForm(request.GET or None)
         if form.is_valid():
@@ -97,7 +96,6 @@ def transaction_report(request):
 
     except AccountInfo.DoesNotExist:
         messages.error(request, "No account information found for the current user.")
-    
     context = {
         'username': request.user.username,
         'account_no': account_info.account_No,
