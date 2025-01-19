@@ -11,10 +11,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import AccountInfo, SessionSettings
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .models import AccountInfo, SessionSettings
-
 def home(request):
 	# 驗證是否已登入
 	if not request.user.is_authenticated:
@@ -45,7 +41,7 @@ def home(request):
 	# 處理計時器更新
 	if request.method == "POST":
 		timeout = int(request.POST.get("timeout_minutes", 5))
-		print(f'POST...timeout: {timeout_minutes}')
+		# print(f'POST...timeout: {timeout_minutes}')
 		session_setting, created = SessionSettings.objects.get_or_create(id=1)
 		session_setting.timeout_minutes = timeout
 		session_setting.save()

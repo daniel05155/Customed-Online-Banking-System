@@ -9,11 +9,12 @@ class Transaction(models.Model):
     TRANSACTION_TYPE_CHOICES = [
         ('Deposit', 'Deposit'),
         ('Withdrawal', 'Withdrawal'),
-        ('Transfer', 'Transfer'),
+        ('Transfer_Sender', 'Transfer_Sender'),
+        ('Transfer_Receiver', 'Transfer_Receiver'),
     ]
     transaction_id      = models.AutoField(primary_key=True)
     transaction_account_info = models.ForeignKey(AccountInfo, on_delete=models.CASCADE, related_name='transactions')  # One-to-Many
-    transaction_type    = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES)
+    transaction_type    = models.CharField(max_length=30, choices=TRANSACTION_TYPE_CHOICES)
     transaction_time    = models.DateTimeField(auto_now_add=True)
     transaction_amount  = models.DecimalField(max_digits=15, decimal_places=2)
     transaction_note    = models.TextField(null=True, blank=True, default="")                    # transaction remarks
@@ -26,11 +27,11 @@ class Transfer(models.Model):
         ('Failed', 'Failed'),
     ]
 
-    transfer_id               = models.AutoField(primary_key=True)
-    transfer_from_account     = models.ForeignKey(AccountInfo, on_delete=models.CASCADE, related_name='transfers_from')
-    transfer_to_account       = models.ForeignKey(AccountInfo, on_delete=models.CASCADE, related_name='transfers_to')
-    transfer_info             = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='transfers',null=True, blank=True)  # Link to Transaction
-    transfer_status           = models.CharField(max_length=10, choices=TRANSFER_STATUS_CHOICES, default='Failed')
+    transfer_id             = models.AutoField(primary_key=True)
+    transfer_from_account   = models.ForeignKey(AccountInfo, on_delete=models.CASCADE, related_name='transfers_from')
+    transfer_to_account     = models.ForeignKey(AccountInfo, on_delete=models.CASCADE, related_name='transfers_to')
+    transfer_info           = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='transfers',null=True, blank=True)  # Link to Transaction
+    transfer_status         = models.CharField(max_length=10, choices=TRANSFER_STATUS_CHOICES, default='Failed')
     # transfer_amount   = models.DecimalField(max_digits=15, decimal_places=2)      # FK: Daily limit of 100,000
     # transfer_time     = models.DateTimeField(auto_now_add=True)                   # FK: Transaction.transaction_time
     
